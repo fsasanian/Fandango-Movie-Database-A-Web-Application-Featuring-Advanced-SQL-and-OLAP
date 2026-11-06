@@ -1,155 +1,304 @@
-# Fandango-Movie-Database-A-Web-Application-Featuring-Advanced-SQL-and-OLAP
-https://www.loom.com/share/a25310366a654082ac3136201fa94602?sid=cafd2c49-51fe-47e8-85fe-8f8a4834dba6
-# Fandango: A Comprehensive Movie Database Web App with Advanced SQL, OLAP, and a User-Friendly Interface
-Fandango is a web application designed to manage movie data while showcasing a range of complex SQL queries, including set operations, set membership, set comparison, subqueries using the WITH clause, advanced aggregate functions, and OLAP. The application features a user-friendly interface with interactive menus, buttons, and icons.
 
+# Fandango Movie Database & Analytics
 
-## Features-----------------------------------------------------------------
-- **Advanced SQL Queries:** Advanced SQL queries including (set operations, set membership, comparison, and subqueries with the WITH clause).
-- **OLAP Functionality:** OLAP functionality including window functions and ROLLUP.
-- **User-Friendly Interface:** A userfriendly interface with Bootstrap-based menus, buttons, and icons ,and Creating interactive charts and visualizations using Chart.js.
-- **User Authentication:** Registration, login, and logout functionality using Flask-Login.
-- **Robust Error Handling:** Custom error pages for 404 and 500 errors, and Logging of important events and errors in `app.log`.
+A movie database web application built with Python, Flask,
+and MySQL to demonstrate advanced SQL querying, OLAP
+operations, database management, and interactive data
+visualization.
 
+## Project Demo
 
-## How to Set it Up-----------------------------------------------------------
-1. **Install:** Python, MySQL, Flask.
-2. **Run the app** by typing in terminal: `/opt/anaconda3/bin/python app1.py`
-3. **Open the browser** and go to [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+[Watch the Application Demo on Loom](https://www.loom.com/share/a25310366a654082ac3136201fa94602)
 
+## Project Overview
 
-## Advanced SQL Query Documentation--------------------------------------------
+This project explores how relational databases and
+advanced SQL techniques can support data-driven
+applications.
 
-### High Rated Reviews
-**query:**
+The Fandango application was designed to allow users
+to browse movies, search by title, view movie reviews,
+submit ratings, and explore movie analytics.
 
+The project emphasizes:
+
+- Relational database querying with MySQL
+- Advanced SQL analytics and Common Table Expressions
+- Window functions and OLAP operations
+- Web application development using Flask
+- Interactive data visualization with Chart.js
+
+## Technologies Used
+
+| Category | Technologies |
+|---|---|
+| Programming | Python, SQL |
+| Database | MySQL |
+| Web Framework | Flask |
+| Authentication | Flask-Login |
+| Frontend | HTML, Bootstrap |
+| Visualization | Chart.js |
+| Analytics | CTEs, Subqueries, Window Functions, ROLLUP |
+
+## Key Features
+
+### Movie Management and Search
+- Browse available movies and their details.
+- Search for movies using partial title matches.
+- View associated ratings and reviews.
+- Submit movie ratings and reviews.
+
+### Advanced SQL Analytics
+- Common Table Expressions (CTEs)
+- Aggregate functions and grouped summaries
+- Subqueries and set operations
+- Set membership filtering
+- Ranking with SQL window functions
+- OLAP summaries using ROLLUP
+
+### Web Application
+- User registration, login, and logout
+- Bootstrap-based navigation
+- Interactive charts using Chart.js
+- Custom 404 and 500 error pages
+- Application logging for troubleshooting
+
+## SQL Query Examples
+
+The following queries demonstrate the main analytical
+techniques documented in this project.
+
+### 1. High-Rated Reviews — CTE
+
+```sql
 WITH HighRatings AS (
-    SELECT * FROM Review WHERE Rating >= 4
+    SELECT *
+    FROM Review
+    WHERE Rating >= 4
 )
-SELECT * FROM HighRatings;
-**This query uses a Common Table Expression (CTE) with the WITH clause to select all reviews that have a rating of 4 or higher.**
--------------------------------
+SELECT *
+FROM HighRatings;
+```
 
-### Average Rating per Movie
+Uses a Common Table Expression to retrieve reviews
+with ratings of 4 or higher.
 
-SELECT MovieID, AVG(Rating) AS AvgRating
+### 2. Average Rating per Movie — Aggregation
+
+```sql
+SELECT
+    MovieID,
+    AVG(Rating) AS AvgRating
 FROM Review
 GROUP BY MovieID;
-**This query calculates the average rating for each movie by grouping the reviews by MovieID and using the AVG() aggregate function.**
------------------------------------
+```
 
-### Movie Detail with Reviews
+Calculates the average review rating for each movie.
 
-**Movie Details:** SELECT * FROM Movie WHERE MovieID = %s;
+### 3. Movie Details and Reviews
 
-**Movie Revies:** SELECT * FROM Review WHERE MovieID = %s ORDER BY ReviewDate DESC;
+```sql
+SELECT *
+FROM Movie
+WHERE MovieID = %s;
 
-**The first query show the details for a specific movie. The second query fetches all reviews for that movie, ordered by the most recent review first.**
-------------------------------------------
+SELECT *
+FROM Review
+WHERE MovieID = %s
+ORDER BY ReviewDate DESC;
+```
 
-### Movies Above Overall Average Rating
+Retrieves the selected movie's information and its
+reviews, ordered from newest to oldest.
 
-SELECT MovieID, AVG(Rating) AS AvgRating 
-FROM Review 
-GROUP BY MovieID 
-HAVING AVG(Rating) > (SELECT AVG(Rating) FROM Review);
+The `%s` placeholders are intended for parameterized
+queries executed through Python.
 
-**This query first calculates the overall average rating across all reviews using a subquery. Then, it selects movies whose average rating is higher than that overall average**
---------------------------------------------------
-### Ranked Movies (OLAP)
-SELECT 
-    MovieID, 
+### 4. Movies Above Overall Average Rating — Subquery
+
+```sql
+SELECT
+    MovieID,
+    AVG(Rating) AS AvgRating
+FROM Review
+GROUP BY MovieID
+HAVING AVG(Rating) > (
+    SELECT AVG(Rating)
+    FROM Review
+);
+```
+
+Identifies movies whose average rating is higher
+than the overall average across all reviews.
+
+### 5. Ranked Movies — Window Function
+
+```sql
+SELECT
+    MovieID,
     AVG(Rating) AS AvgRating,
-    RANK() OVER (ORDER BY AVG(Rating) DESC) AS rank_val
+    RANK() OVER (
+        ORDER BY AVG(Rating) DESC
+    ) AS rank_val
 FROM Review
 GROUP BY MovieID
 ORDER BY rank_val;
+```
 
+Ranks movies according to their average ratings
+using the SQL `RANK()` window function.
 
-**This query calculates the average rating per movie and then uses the window function RANK() to assign a rank based on the average rating.**
--------------------------------------------------------
+### 6. Movies by Genre — Set Membership
 
-### Movies by Genre (Set Membership)
+```sql
+SELECT *
+FROM Movie
+WHERE Genre IN ('Comedy', 'Action', 'Drama');
+```
 
-SELECT * FROM Movie WHERE Genre IN ('Comedy', 'Action', 'Drama');
+Filters the database to display movies belonging
+to selected genres.
 
-**This query uses the IN operator to filter movies that belong to one of the specified genres (Comedy, Action, or Drama).**
----------------------------------------------------------
+### 7. Movies by Genre — Set Operations
 
-### Movies (Comedy/Action) Using Set Operations
+```sql
+SELECT *
+FROM Movie
+WHERE Genre = 'Comedy'
 
-(SELECT * FROM Movie WHERE Genre = 'Comedy')
 UNION
-(SELECT * FROM Movie WHERE Genre = 'Action');
 
-**This query combines movies from the Comedy and Action genres.**
------------------------------------
+SELECT *
+FROM Movie
+WHERE Genre = 'Action';
+```
 
-### ROLLUP for Review Summary
+Combines results from Comedy and Action genres
+using SQL `UNION`.
 
-SELECT 
+### 8. Review Summary by Genre — OLAP ROLLUP
+
+```sql
+SELECT
     m.Genre,
     COUNT(*) AS TotalReviews,
     AVG(r.Rating) AS AverageRating
 FROM Movie m
-JOIN Review r ON m.MovieID = r.MovieID
+JOIN Review r
+    ON m.MovieID = r.MovieID
 GROUP BY m.Genre WITH ROLLUP;
+```
 
-**This query summarizes review data by genre with a grand total row.**
-------------------------------------------
+Produces aggregated review statistics by genre,
+including a grand-total row.
 
-### Search Movies by Title
+### 9. Search Movies by Title
 
-SELECT * FROM Movie WHERE Title LIKE %s;
+```sql
+SELECT *
+FROM Movie
+WHERE Title LIKE %s;
+```
 
-**This query searches for movies by title.** 
----------------------------------------------
+Supports searching for movies by title through
+a parameterized query.
 
-### Submit a Review
+### 10. Submit a Movie Review
 
-INSERT INTO Review (MovieID, Rating, Comment, ReviewDate, UserID) VALUES (%s, %s, %s, NOW(), %s);
+```sql
+INSERT INTO Review (
+    MovieID,
+    Rating,
+    Comment,
+    ReviewDate,
+    UserID
+)
+VALUES (%s, %s, %s, NOW(), %s);
+```
 
-**This query inserts a new review into the Review table.**
-----------------------------------------------
+Adds a new user review to the database.
 
-### View All Reviews
+### 11. View All Reviews
 
-SELECT * FROM Review ORDER BY ReviewDate DESC;
+```sql
+SELECT *
+FROM Review
+ORDER BY ReviewDate DESC;
+```
 
-**This query retrieves all reviews from the Review table, ordered by review date in descending order**
+Retrieves all reviews, beginning with the most recent.
 
+## User Interface
 
-## User Interface and Interactive Elements------------------------------------------
+The application includes several interactive components:
 
-**Home Page:**  
-The home page features a navigation bar with links to key sections like Movies Above Average, Ranked Movies, and Movies by Genre.
+**Home Page:** Navigation to movie categories,
+rating analytics, and database features.
 
-**Movie Detail Page:**  
-Displays detailed information about a selected movie, including its title, genre, synopsis, and reviews. Includes a Back to Home button for easy navigation.
+**Movie Details:** Individual movie information,
+ratings, and associated reviews.
 
-**Review Submission:**  
-A form that allows users to submit reviews for a movie, with input fields for movie ID, rating, and comment.
-  
-**Interactive Charts:**  
-Useing Chart.js to display visual data on pages like the Ranked Movies page.
+**Search:** Title-based movie search functionality.
 
-**Search:**  
-A search box on the home page allows users to enter a movie title and click "Search" to find movies by title.
+**Review Submission:** Forms for submitting movie
+ratings and comments.
 
-**Error Handling:**
-Custom error pages (404 and 500) provide user-friendly messages, and detailed logs are saved in app.log for troubleshooting.
+**Visual Analytics:** Interactive charts created
+using Chart.js.
 
+**Authentication:** User registration, login,
+and logout functionality.
 
-# Troubleshooting and FAQ----------------------------------------
+**Error Handling:** Custom error pages and
+application logging.
 
-- **Database Errors:** Ensure my MySQL credentials in `app1.py` are correct.
-- **Application Not Starting:** Verify that all dependencies are installed and using the correct Python interpreter.
-- **Login Issues:** Ensure that email addresses are entered correctly (with an "@" symbol).
-- **Examples:**
- **Problem:** I can’t see the movies.  
-  **Solution:** Check the database settings and make sure MySQL is running.
-  
-- **Problem:** The login page is not working.  (Put the example in Screenshot file)
-  **Solution:** Check that the typed  email correctly (it should have an "@" sign) and try again. 
-  
+## Running the Application
 
+The current public repository contains project
+documentation and SQL examples. The original Flask
+application files and database setup materials
+have not yet been uploaded.
+
+Once the source files are available, this section
+will include complete installation instructions,
+database initialization steps, and dependencies.
+
+The original application documentation refers to
+`app1.py` as the Python entry point and uses
+`http://127.0.0.1:5000/` as its local address.
+
+## Troubleshooting
+
+**Database connection issues**
+- Confirm that MySQL is running.
+- Verify the database connection settings.
+
+**Application startup issues**
+- Confirm that the required Python packages
+  are installed.
+
+**Login issues**
+- Check that the registration and login
+  information is entered correctly.
+
+**Missing movie data**
+- Verify the database connection and
+  confirm that the tables contain records.
+
+## Future Improvements
+
+- Upload the original Flask application source.
+- Add database schema and sample data.
+- Document installation dependencies.
+- Include application screenshots.
+- Add reproducible database setup instructions.
+
+## Author
+
+**Farnaz Sasanian**
+
+M.S. in Data Science — Illinois Institute of Technology
+
+[GitHub](https://github.com/fsasanian) |
+[LinkedIn](https://www.linkedin.com/in/fsasanian/) |
+[Tableau Portfolio](https://public.tableau.com/app/profile/farnaz.sasanian/vizzes)
